@@ -1,4 +1,6 @@
-
+#Convert Old Bedrock 1.18 and lower /execute commands to New Bedrock 1.19+
+#Made by L0VE MC aka Love#1000
+#Published by Odin Network
 import os
 
 def fix_t_format(command):
