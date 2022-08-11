@@ -1,63 +1,59 @@
 #Convert Old Bedrock 1.18 and lower /execute commands to New Bedrock 1.19+
 #Made by L0VE MC aka Love#1000
 #Published by Odin Network
+
 import os
 
-def fix_t_format(command):
+# TODO - Curtidor
+# add suport for detect [Not Done]
+# add suport for execute pos other than triple tilde [Not Done]
+# fix the problem with fill summon etc [Done]
+
+###CONSTS###
+DIRECTORY_PATH = 'CMD Converter+/old'
+
+
+def fix_t_format(command: str) -> str:
     command = command.replace("~ ~ ~", "~~~")
-    command  = command.replace("~ ~~", "~~~")
-    command  = command.replace("~~ ~", "~~~")
+    command = command.replace("~ ~~", "~~~")
+    command = command.replace("~~ ~", "~~~")
     return command
 
-def translate(command):
-    command = command.replace("execute @p","execute as @p")
-    command = command.replace("execute @a","execute as @a")
-    command = command.replace("execute @r","execute as @r")
-    command = command.replace("execute @e","execute as @e")
-    command = command.replace("execute @s","execute as @s")
-    command = command.replace("~~~","at @s run")
-    return command
 
-def main(command):
-    command = fix_t_format(command)
-    command = translate(command)
-    return(command)
+def translate(command: str) -> str:
+	command = fix_t_format(command)
+	command = command.replace("execute @p", "execute as @p")
+	command = command.replace("execute @a", "execute as @a")
+	command = command.replace("execute @r", "execute as @r")
+	command = command.replace("execute @e", "execute as @e")
+	command = command.replace("execute @s", "execute as @s")
+	command_data = command.split()
+	for index, token in enumerate(command_data):
+		if token == '~~~' and command_data[index-1] == 'execute':
+			command = command.replace("~~~", "at @s run")
+	return command
 
-def show(total_converted, total_not, err_lines, file, line_count):
-        print(f"----------------\n{file} was converted.\nExecute Commands: {total_converted}\nSkipped Lines: {total_not}\nTotal Lines: {line_count}\n")
-        if err_lines != []:
-            print(f"Check lines {err_lines} for errors (/fills, /particles and /summons can bug out sometimes)\n")
 
-path_of_the_directory= '.\old'
+def show(total_converted: int, total_not: int, file: str, line_count: int) -> None:
+    print(f"{'-'.rjust(20,'-')} \n{file} was converted.")
+    print( f"Execute Commands: {total_converted}\nSkipped Lines:{total_not}\nTotal Lines: {line_count}\n" )
 
-for filename in os.listdir(path_of_the_directory):
-    f = os.path.join(path_of_the_directory,filename)
-    if os.path.isfile(f):
-        filename=f.replace(".\old\\","")
-        f = f.replace(".\old\\","")
-        if ".mcfunction" in f:
-            with open(f'.\\new\\{f}', 'w') as file:
-                with open(f'.\old\\{f}', 'r') as f:
-                        exe_commands = 0 
-                        non_exe = 0
-                        line_count = 0
-                        error_lines = []
-                        for line in f:
-                            line_count += 1
-                            if 'execute' in line:
-                                exe_commands += 1
-                                file.write(main(line))
-                                if "fill" in line:
-                                    error_lines += [f"{str(line_count)}"]
-                                if "summon" in line:
-                                    error_lines += [f"{str(line_count)}"]
-                                if "particle" in line:
-                                    error_lines += [f"{str(line_count)}"]
-                            else:
-                                non_exe += 1
-                                file.write(line)
-                show(exe_commands,non_exe,error_lines,filename,line_count)
-        else:
-            print(f"\n{f} was skipped because it is not a .mcfunction\n")
+
+for file_name in os.listdir(DIRECTORY_PATH):
+    if file_name.endswith('mcfunction'):
+        with open(os.path.join('CMD Converter+/new', file_name),
+                  'w') as out_file:
+            with open(os.path.join('CMD Converter+/old', file_name),
+                      'r') as reader:
+                exe_commands = 0
+                non_exe = 0
+                for line_count, command in enumerate(reader):
+                    if 'execute' in command:
+                        exe_commands += 1
+                        out_file.write(translate(command))
+                    else:
+                        non_exe += 1
+                        out_file.write(command)
+            show(exe_commands, non_exe, file_name, line_count)
 
 close = input("----------------\nType anything to close...")
