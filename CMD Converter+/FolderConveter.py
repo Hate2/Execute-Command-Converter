@@ -41,10 +41,8 @@ def show(total_converted: int, total_not: int, file: str, line_count: int) -> No
 
 for file_name in os.listdir(DIRECTORY_PATH):
     if file_name.endswith('mcfunction'):
-        with open(os.path.join('CMD Converter+/new', file_name),
-                  'w') as out_file:
-            with open(os.path.join('CMD Converter+/old', file_name),
-                      'r') as reader:
+        with open(os.path.join('CMD Converter+/new', file_name), 'w') as out_file:
+            with open(os.path.join('CMD Converter+/old', file_name), 'r') as reader:
                 exe_commands = 0
                 non_exe = 0
                 for line_count, command in enumerate(reader):
