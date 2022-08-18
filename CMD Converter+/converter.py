@@ -63,7 +63,6 @@ def convert(command: str) -> Iterator[str]:
 			command_data[index] = 'if block'
 			if command_data[index - 1] == 'at @s run': command_data[index-1] = 'at @s'
 			add_run(command_data, index, 2)
-	print(command_data)
 	yield " ".join(command_data)
 
 
