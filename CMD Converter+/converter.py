@@ -6,8 +6,8 @@ import os
 from typing import Iterator
 
 # TODO - Curtidor
-# add support for detect [Half Done]
-# add support for execute pos other than triple tilde [Not Done]
+# add support for detect [Done]
+# add support for execute pos other than triple tilde [Done]
 # fix the problem with fill summon etc [Done]
 
 ### CONSTS ###
