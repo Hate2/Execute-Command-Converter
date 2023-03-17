@@ -3,19 +3,22 @@
 # Published by Odin Network
 
 import os
-from typing import Iterator
 
-# TODO - Curtidor
-# add support for detect [Done]
-# add support for execute pos other than triple tilde [Done]
-# fix the problem with fill summon etc [Done]
-
-## CONSTS ###
+## CONSTANTS ###
 SOURCE_DIRECTORY_PATH = "./old"
 OUT_DIRECTORY_PATH = "./new"
 
 
-def convert_selector(command):
+def convert_selector(command: str) -> list[str]:
+    """
+    Converts /execute commands that use player selectors to the new selector syntax.
+
+    Args:
+        command (str): The command to convert.
+
+    Returns:
+        str: The tokens of the converted command.
+    """
     return command.replace("execute @p", "execute as @p") \
         .replace("execute @a", "execute as @a") \
         .replace("execute @r", "execute as @r") \
@@ -23,8 +26,16 @@ def convert_selector(command):
         .replace("execute @s", "execute as @s").split()
 
 
-# formats the position (x, y, z) for consistent spacing
-def formate_command(command: str) -> list[str]:
+def format_command(command: str) -> list[str]:
+    """
+    Formats the position (x, y, z) for consistent spacing.
+
+    Args:
+        command (str): The command to format.
+
+    Returns:
+        list[str]: A list of the formatted command's parts.
+    """
     command_data = convert_selector(command)
 
     index = 0
@@ -39,20 +50,38 @@ def formate_command(command: str) -> list[str]:
     return command_data
 
 
-# adds the run key word
 def add_run(command_data: list[str], index: int, offset: int) -> None:
+    """
+    Adds the "run" keyword to a command after the execute subcommand.
+
+    Args:
+        command_data (list[str]): The list of command parts to modify.
+        index (int): The index of the execute subcommand in the list.
+        offset (int): The offset from the execute subcommand where the "run" keyword should be added.
+    """
     index += 1
     while index < len(command_data):
         if command_data[index].lstrip('-').isdigit() or '~' in command_data[index]:
             index += 1
         else:
             break
-    if not command_data[index] == 'detect': command_data[index + offset] = 'run ' + command_data[index + offset]
+    if not command_data[index] == 'detect':
+        command_data[index + offset] = 'run ' + command_data[index + offset]
 
 
 def convert(command: str) -> str:
-    if not command.startswith('execute'): return command.rstrip('\n')
-    command_data = formate_command(command)
+    """
+    Converts a single /execute command from the old format to the new format.
+
+    Args:
+        command (str): The command to convert.
+
+    Returns:
+        str: The converted command.
+    """
+    if not command.startswith('execute'):
+        return command.rstrip('\n')
+    command_data = format_command(command)
     for index, token in enumerate(command_data):
         if token == 'execute' or token == 'run execute':
             if command_data[index + 3] == '~~~':
@@ -64,7 +93,7 @@ def convert(command: str) -> str:
             command_data[index] = 'if block'
             if command_data[index - 1] == 'at @s run': command_data[index - 1] = 'at @s'
             add_run(command_data, index, 2)
-    return " ".join(command_data)
+        return " ".join(command_data)
 
 
 def convert_file(source_path: str, out_path: str) -> None:
