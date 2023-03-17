@@ -3,7 +3,6 @@
 # Published by Odin Network
 
 import os
-from typing import Iterator
 
 # TODO - Curtidor
 # add support for detect [Done]
